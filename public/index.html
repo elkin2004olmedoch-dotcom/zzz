@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#183b34">
+  <title>Productos | ogadmin</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1d2925;
+      --muted: #64716b;
+      --line: #dce3dc;
+      --paper: #f3f5ef;
+      --white: #fff;
+      --forest: #183b34;
+      --green: #2f705b;
+      --mint: #d9e8dd;
+      --coral: #b94b35;
+      --shadow: 0 18px 55px rgb(22 43 34 / 16%);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: "Aptos", "Segoe UI", sans-serif;
+      font-size: 14px;
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .topbar {
+      min-height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 0 clamp(18px, 5vw, 72px);
+      color: #f4f4eb;
+      background: var(--forest);
+    }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 700; }
+    .brand-mark {
+      display: grid;
+      width: 30px;
+      aspect-ratio: 1;
+      place-items: center;
+      color: var(--forest);
+      background: #d6e783;
+      font-family: Georgia, serif;
+      font-size: 20px;
+    }
+    .topbar-note { color: #bfd0c5; font-size: 12px; }
+    main { width: min(1180px, calc(100% - 36px)); margin: 38px auto 60px; }
+    .heading-row {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .eyebrow { margin: 0 0 7px; color: var(--green); font-size: 11px; font-weight: 800; text-transform: uppercase; }
+    h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: 34px; font-weight: 500; }
+    .subtitle { margin: 7px 0 0; color: var(--muted); }
+    .summary { display: flex; align-items: baseline; gap: 8px; padding: 0 0 4px; white-space: nowrap; }
+    .summary strong { font-family: Georgia, serif; font-size: 26px; font-weight: 500; }
+    .summary span { color: var(--muted); }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .toolbar-copy { color: var(--muted); }
+    .primary, .secondary, .danger, .page-button, .method-button {
+      min-height: 38px;
+      border: 1px solid transparent;
+      padding: 0 14px;
+      font-weight: 700;
+      transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
+    }
+    .primary { color: #fff; background: var(--green); }
+    .primary:hover { background: var(--forest); }
+    .secondary, .page-button, .method-button { color: var(--ink); border-color: var(--line); background: var(--white); }
+    .secondary:hover, .page-button:hover, .method-button:hover { border-color: var(--green); }
+    .danger { color: var(--coral); border-color: #e8c9c1; background: #fff; }
+    .danger:hover { color: #fff; border-color: var(--coral); background: var(--coral); }
+    button:disabled { cursor: not-allowed; opacity: .46; }
+    .table-wrap { overflow-x: auto; background: var(--white); }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th {
+      height: 42px;
+      padding: 0 16px;
+      color: var(--muted);
+      background: #f8f9f5;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    td { height: 52px; padding: 8px 16px; border-top: 1px solid #e8ece6; }
+    th:first-child, td:first-child { width: 80px; color: var(--muted); }
+    th:last-child, td:last-child { width: 190px; text-align: right; white-space: nowrap; }
+    td:nth-child(4), th:nth-child(4) { text-align: right; }
+    .product-name { font-weight: 700; }
+    .category { color: var(--muted); }
+    .price { font-variant-numeric: tabular-nums; }
+    .row-action { min-height: 32px; margin-left: 6px; padding: 0 9px; font-size: 12px; }
+    .empty { height: 100px; color: var(--muted); text-align: center; }
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 15px 0;
+      color: var(--muted);
+      border-bottom: 1px solid var(--line);
+    }
+    .page-controls { display: flex; align-items: center; gap: 8px; }
+    .page-count { min-width: 90px; color: var(--ink); text-align: center; font-variant-numeric: tabular-nums; }
+    .notice { min-height: 24px; padding-top: 9px; color: var(--muted); }
+    .notice[data-kind="error"] { color: #a43828; }
+    dialog {
+      width: min(480px, calc(100% - 28px));
+      max-height: min(90vh, 700px);
+      padding: 0;
+      border: 1px solid var(--line);
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+    dialog::backdrop { background: rgb(17 35 29 / 54%); }
+    .dialog-head { padding: 22px 24px 17px; border-bottom: 1px solid var(--line); }
+    .dialog-head h2 { margin: 0; font-family: Georgia, serif; font-size: 25px; font-weight: 500; }
+    .dialog-head p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+    .product-form { display: grid; gap: 15px; padding: 20px 24px 24px; }
+    .field { display: grid; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .field input {
+      width: 100%;
+      height: 42px;
+      padding: 0 11px;
+      color: var(--ink);
+      border: 1px solid #cbd5cd;
+      border-radius: 0;
+      background: #fff;
+      outline: none;
+    }
+    .field input:focus { border-color: var(--green); box-shadow: 0 0 0 2px var(--mint); }
+    .method-label { margin: 2px 0 -7px; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .form-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; padding-top: 4px; }
+    .form-error { min-height: 17px; margin: 0; color: #a43828; font-size: 12px; }
+    @media (max-width: 640px) {
+      main { width: calc(100% - 24px); margin-top: 25px; }
+      .topbar { min-height: 56px; padding: 0 14px; }
+      .heading-row { align-items: start; flex-direction: column; gap: 12px; }
+      h1 { font-size: 30px; }
+      .toolbar, .pagination { align-items: flex-start; flex-direction: column; }
+      .toolbar { gap: 11px; }
+      th, td { padding-right: 11px; padding-left: 11px; }
+      th:last-child, td:last-child { width: 160px; }
+      .row-action { margin-left: 3px; padding: 0 7px; }
+      .pagination { gap: 12px; }
+      .page-controls { width: 100%; justify-content: space-between; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">o</span><span>ogadmin</span></div>
+    <span class="topbar-note">Inventario · PostgreSQL</span>
+  </header>
+
+  <main>
+    <section class="heading-row" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">Administración de datos</p>
+        <h1 id="page-title">Productos</h1>
+        <p class="subtitle">Consulta y administra el inventario conectado a PostgreSQL.</p>
+      </div>
+      <div class="summary" aria-live="polite"><strong id="total-count">—</strong><span>productos en la base</span></div>
+    </section>
+
+    <section aria-label="Lista de productos">
+      <div class="toolbar">
+        <span class="toolbar-copy" id="range-label">Cargando productos…</span>
+        <button class="primary" id="create-button" type="button">+ Nuevo producto</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th scope="col">ID</th><th scope="col">Nombre</th><th scope="col">Categoría</th><th scope="col">PVP</th><th scope="col">Acciones</th></tr>
+          </thead>
+          <tbody id="products-body"><tr><td class="empty" colspan="5">Conectando con la base de datos…</td></tr></tbody>
+        </table>
+      </div>
+      <nav class="pagination" aria-label="Paginación de productos">
+        <span id="page-summary">Página — de —</span>
+        <div class="page-controls">
+          <button class="page-button" id="previous-button" type="button" disabled>Anterior</button>
+          <span class="page-count" id="page-count">— / —</span>
+          <button class="page-button" id="next-button" type="button" disabled>Siguiente</button>
+        </div>
+      </nav>
+      <p class="notice" id="notice" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <dialog id="product-dialog" aria-labelledby="dialog-title">
+    <div class="dialog-head">
+      <h2 id="dialog-title">Nuevo producto</h2>
+      <p id="dialog-description">Completa los datos para guardar en PostgreSQL.</p>
+    </div>
+    <form class="product-form" id="product-form">
+      <label class="field" for="name-input">Nombre
+        <input id="name-input" name="nombre" type="text" maxlength="100" required autocomplete="off">
+      </label>
+      <label class="field" for="category-input">Categoría
+        <input id="category-input" name="categoria" type="text" maxlength="100" required autocomplete="off">
+      </label>
+      <label class="field" for="price-input">PVP
+        <input id="price-input" name="pvp" type="number" min="0" max="99999999.99" step="0.01" required>
+      </label>
+      <p class="form-error" id="form-error" aria-live="polite"></p>
+      <div class="form-actions">
+        <button class="secondary" id="cancel-button" type="button">Cancelar</button>
+        <button class="secondary" id="patch-button" type="submit" value="PATCH" hidden>PATCH · Solo cambios</button>
+        <button class="primary" id="save-button" type="submit" value="POST">Crear producto</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    const pageSize = 100;
+    const productDialog = document.querySelector('#product-dialog');
+    const productForm = document.querySelector('#product-form');
+    const productsBody = document.querySelector('#products-body');
+    const notice = document.querySelector('#notice');
+    const nameInput = document.querySelector('#name-input');
+    const categoryInput = document.querySelector('#category-input');
+    const priceInput = document.querySelector('#price-input');
+    const patchButton = document.querySelector('#patch-button');
+    const saveButton = document.querySelector('#save-button');
+    let currentPage = 1;
+    let totalProducts = 0;
+    let activeProduct = null;
+    const productsById = new Map();
+
+    const numberFormat = new Intl.NumberFormat('es', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+    const integerFormat = new Intl.NumberFormat('es');
+
+    async function request(url, options) {
+      const response = await fetch(url, options);
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || `Error HTTP ${response.status}`);
+      return data;
+    }
+
+    function setNotice(message, kind = '') {
+      notice.textContent = message;
+      notice.dataset.kind = kind;
+    }
+
+    function addCell(row, value, className = '') {
+      const cell = document.createElement('td');
+      cell.textContent = value;
+      if (className) cell.className = className;
+      row.append(cell);
+      return cell;
+    }
+
+    function makeAction(label, action, productId, className) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `${className} row-action`;
+      button.textContent = label;
+      button.dataset.action = action;
+      button.dataset.id = productId;
+      return button;
+    }
+
+    function renderProducts(products) {
+      productsBody.replaceChildren();
+      productsById.clear();
+      if (products.length === 0) {
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 5;
+        cell.className = 'empty';
+        cell.textContent = 'No hay productos en esta página.';
+        row.append(cell);
+        productsBody.append(row);
+        return;
+      }
+
+      for (const product of products) {
+        productsById.set(String(product.id), product);
+        const row = document.createElement('tr');
+        addCell(row, String(product.id));
+        addCell(row, product.nombre, 'product-name');
+        addCell(row, product.categoria, 'category');
+        addCell(row, numberFormat.format(Number(product.pvp)), 'price');
+        const actions = document.createElement('td');
+        actions.append(
+          makeAction('Editar', 'edit', product.id, 'secondary'),
+          makeAction('Eliminar', 'delete', product.id, 'danger')
+        );
+        row.append(actions);
+        productsBody.append(row);
+      }
+    }
+
+    async function loadProducts(page = currentPage) {
+      setNotice('Consultando PostgreSQL…');
+      try {
+        const result = await request(`/api/productos?page=${page}&limit=${pageSize}`);
+        if (page > result.totalPages && result.totalPages > 0) return loadProducts(result.totalPages);
+        currentPage = page;
+        totalProducts = result.total;
+        renderProducts(result.products);
+        document.querySelector('#total-count').textContent = integerFormat.format(result.total);
+        document.querySelector('#range-label').textContent = result.total
+          ? `Mostrando ${integerFormat.format((page - 1) * pageSize + 1)}–${integerFormat.format(Math.min(page * pageSize, result.total))} de ${integerFormat.format(result.total)}`
+          : 'No hay productos';
+        document.querySelector('#page-summary').textContent = `Página ${page} de ${result.totalPages}`;
+        document.querySelector('#page-count').textContent = `${page} / ${result.totalPages}`;
+        document.querySelector('#previous-button').disabled = page <= 1;
+        document.querySelector('#next-button').disabled = page >= result.totalPages;
+        setNotice('Datos recibidos desde PostgreSQL.');
+      } catch (error) {
+        productsBody.replaceChildren();
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 5;
+        cell.className = 'empty';
+        cell.textContent = 'No se pudieron cargar los productos.';
+        row.append(cell);
+        productsBody.append(row);
+        document.querySelector('#range-label').textContent = 'Error de conexión';
+        setNotice(error.message, 'error');
+      }
+    }
+
+    function openCreateDialog() {
+      activeProduct = null;
+      productForm.reset();
+      document.querySelector('#dialog-title').textContent = 'Nuevo producto';
+      document.querySelector('#dialog-description').textContent = 'Completa los datos para guardar en PostgreSQL.';
+      document.querySelector('#form-error').textContent = '';
+      patchButton.hidden = true;
+      saveButton.value = 'POST';
+      saveButton.textContent = 'Crear producto';
+      productDialog.showModal();
+      nameInput.focus();
+    }
+
+    function openEditDialog(product) {
+      activeProduct = {
+        id: product.id,
+        nombre: product.nombre,
+        categoria: product.categoria,
+        pvp: String(Number(product.pvp)),
+      };
+      nameInput.value = product.nombre;
+      categoryInput.value = product.categoria;
+      priceInput.value = activeProduct.pvp;
+      document.querySelector('#dialog-title').textContent = `Editar producto ${product.id}`;
+      document.querySelector('#dialog-description').textContent = 'Usa PUT para reemplazar los datos o PATCH para guardar solo los campos cambiados.';
+      document.querySelector('#form-error').textContent = '';
+      patchButton.hidden = false;
+      saveButton.value = 'PUT';
+      saveButton.textContent = 'PUT · Reemplazar';
+      productDialog.showModal();
+      nameInput.focus();
+    }
+
+    function formValues() {
+      return {
+        nombre: nameInput.value.trim(),
+        categoria: categoryInput.value.trim(),
+        pvp: Number(priceInput.value),
+      };
+    }
+
+    async function saveProduct(event) {
+      event.preventDefault();
+      const method = event.submitter?.value || 'POST';
+      const values = formValues();
+      let payload = values;
+      let url = '/api/productos';
+      let successMessage = 'Producto creado.';
+
+      if (method === 'PUT' || method === 'PATCH') {
+        url += `/${activeProduct.id}`;
+        successMessage = method === 'PUT' ? 'Producto reemplazado.' : 'Cambios parciales guardados.';
+        if (method === 'PATCH') {
+          payload = Object.fromEntries(Object.entries(values).filter(([field, value]) => String(value) !== String(activeProduct[field])));
+          if (Object.keys(payload).length === 0) {
+            document.querySelector('#form-error').textContent = 'Cambia al menos un campo para usar PATCH.';
+            return;
+          }
+        }
+      }
+
+      const submitButtons = productForm.querySelectorAll('button[type="submit"]');
+      submitButtons.forEach((button) => { button.disabled = true; });
+      document.querySelector('#form-error').textContent = '';
+      try {
+        await request(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        productDialog.close();
+        setNotice(successMessage);
+        const targetPage = method === 'POST' ? Math.ceil((totalProducts + 1) / pageSize) : currentPage;
+        await loadProducts(Math.max(1, targetPage));
+        setNotice(successMessage);
+      } catch (error) {
+        document.querySelector('#form-error').textContent = error.message;
+      } finally {
+        submitButtons.forEach((button) => { button.disabled = false; });
+      }
+    }
+
+    async function deleteProduct(productId) {
+      if (!window.confirm(`¿Eliminar el producto ${productId}?`)) return;
+      try {
+        await request(`/api/productos/${productId}`, { method: 'DELETE' });
+        const onlyRowOnPage = totalProducts - (currentPage - 1) * pageSize === 1;
+        const targetPage = onlyRowOnPage && currentPage > 1 ? currentPage - 1 : currentPage;
+        await loadProducts(targetPage);
+        setNotice(`Producto ${productId} eliminado.`);
+      } catch (error) {
+        setNotice(error.message, 'error');
+      }
+    }
+
+    document.querySelector('#create-button').addEventListener('click', openCreateDialog);
+    document.querySelector('#cancel-button').addEventListener('click', () => productDialog.close());
+    document.querySelector('#previous-button').addEventListener('click', () => loadProducts(currentPage - 1));
+    document.querySelector('#next-button').addEventListener('click', () => loadProducts(currentPage + 1));
+    productForm.addEventListener('submit', saveProduct);
+    productsBody.addEventListener('click', (event) => {
+      const button = event.target.closest('button[data-action]');
+      if (!button) return;
+      const productId = Number(button.dataset.id);
+      if (button.dataset.action === 'edit') {
+        openEditDialog(productsById.get(String(productId)));
+      } else {
+        deleteProduct(productId);
+      }
+    });
+
+    loadProducts(1);
+  </script>
+</body>
+</html>

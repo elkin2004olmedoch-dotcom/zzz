@@ -1,0 +1,24 @@
+{
+  "name": "ogadmin-productos-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "API REST MVC para administrar productos con PostgreSQL",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push",
+    "validate": "node --check src/server.js && node --check src/app.js && node --check src/config/db.js && node --check src/config/prisma.js && node --check src/models/productModel.js && npx prisma validate",
+    "audit:prod": "npm audit --omit=dev --audit-level=high",
+    "ci": "npm run validate && npm run audit:prod"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.7.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pg": "^8.13.1",
+    "prisma": "^6.7.0"
+  }
+}

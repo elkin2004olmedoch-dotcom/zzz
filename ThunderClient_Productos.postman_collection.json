@@ -1,0 +1,47 @@
+{
+  "info": {
+    "name": "Productos PostgreSQL",
+    "description": "Peticiones a la API; los datos se consultan desde PostgreSQL.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Estado de la API",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/health"
+      }
+    },
+    {
+      "name": "Listar página 1 (100 productos)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/productos?page=1&limit=100"
+      }
+    },
+    {
+      "name": "Listar página 2 (100 productos)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/productos?page=2&limit=100"
+      }
+    },
+    {
+      "name": "Consultar producto por ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/productos/1"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5052"
+    }
+  ]
+}
