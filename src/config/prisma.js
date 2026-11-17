@@ -1,5 +1,7 @@
-const { PrismaClient } = require('@prisma/client');
+// Prisma ORM 8 model accessor. On Compute it comes from the service's
+// database dependency, wired in service.mjs; queries read orm.public.<Model>.
+const service = require('../../service.mjs').default;
 
-const prisma = new PrismaClient();
+const { db } = service.load();
 
-module.exports = prisma;
+module.exports = db.client.orm;

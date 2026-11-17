@@ -1,10 +1,10 @@
-require('dotenv').config();
+const service = require('../service.mjs').default;
 const app = require('./app');
 const pool = require('./config/db');
 
-const port = Number(process.env.PORT) || 5052;
-const server = app.listen(port, () => {
-  console.log(`API de productos escuchando en http://localhost:${port}`);
+const port = service.port();
+const server = app.listen(port, '0.0.0.0', () => {
+  console.log(`API de productos escuchando en el puerto ${port}`);
 });
 
 async function shutdown() {
