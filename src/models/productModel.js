@@ -1,11 +1,6 @@
-const prisma = require('../config/prisma');
+const orm = require('../config/prisma');
 
-const productSelect = {
-  id: true,
-  nombre: true,
-  categoria: true,
-  pvp: true,
-};
+const productFields = ['id', 'nombre', 'categoria', 'pvp'];
 
 function normalizeProduct(product) {
   if (!product) return null;
@@ -16,14 +11,14 @@ function normalizeProduct(product) {
 }
 
 async function findAll({ limit, offset }) {
-  const [total, products] = await Promise.all([
-    prisma.producto.count(),
-    prisma.producto.findMany({
-      select: productSelect,
-      orderBy: { id: 'asc' },
-      take: limit,
-      skip: offset,
-    }),
+  const [{ total }, products] = await Promise.all([
+    orm.public.Producto.aggregate((aggregate) => ({ total: aggregate.count() })),
+    orm.public.Producto
+      .select(...productFields)
+      .orderBy((producto) => producto.id.asc())
+      .limit(limit)
+      .offset(offset)
+      .all(),
   ]);
 
   return {
@@ -33,36 +28,28 @@ async function findAll({ limit, offset }) {
 }
 
 async function findById(id) {
-  const product = await prisma.producto.findUnique({
-    where: { id },
-    select: productSelect,
-  });
+  const product = await orm.public.Producto
+    .select(...productFields)
+    .first({ id });
 
   return normalizeProduct(product);
 }
 
 async function create({ nombre, categoria, pvp }) {
-  const product = await prisma.producto.create({
-    data: { nombre, categoria, pvp },
-    select: productSelect,
-  });
+  const product = await orm.public.Producto
+    .select(...productFields)
+    .create({ nombre, categoria, pvp });
 
   return normalizeProduct(product);
 }
 
 async function replace(id, { nombre, categoria, pvp }) {
-  try {
-    const product = await prisma.producto.update({
-      where: { id },
-      data: { nombre, categoria, pvp },
-      select: productSelect,
-    });
+  const product = await orm.public.Producto
+    .where({ id })
+    .select(...productFields)
+    .update({ nombre, categoria, pvp });
 
-    return normalizeProduct(product);
-  } catch (error) {
-    if (error.code === 'P2025') return null;
-    throw error;
-  }
+  return normalizeProduct(product);
 }
 
 async function update(id, fields) {
@@ -72,32 +59,21 @@ async function update(id, fields) {
     data[field] = value;
   }
 
-  try {
-    const product = await prisma.producto.update({
-      where: { id },
-      data,
-      select: productSelect,
-    });
+  const product = await orm.public.Producto
+    .where({ id })
+    .select(...productFields)
+    .update(data);
 
-    return normalizeProduct(product);
-  } catch (error) {
-    if (error.code === 'P2025') return null;
-    throw error;
-  }
+  return normalizeProduct(product);
 }
 
 async function remove(id) {
-  try {
-    const product = await prisma.producto.delete({
-      where: { id },
-      select: { id: true },
-    });
+  const product = await orm.public.Producto
+    .select('id')
+    .where({ id })
+    .delete();
 
-    return product;
-  } catch (error) {
-    if (error.code === 'P2025') return null;
-    throw error;
-  }
+  return product;
 }
 
 module.exports = { findAll, findById, create, replace, update, remove };

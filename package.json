@@ -7,18 +7,29 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "prisma:generate": "prisma generate",
-    "prisma:push": "prisma db push",
-    "validate": "node --check src/server.js && node --check src/app.js && node --check src/config/db.js && node --check src/config/prisma.js && node --check src/models/productModel.js && npx prisma validate",
+    "build": "node scripts/build.mjs",
+    "validate": "node --check src/server.js && node --check src/app.js && node --check src/config/db.js && node --check src/config/prisma.js && node --check src/models/productModel.js && npx prisma migration check",
     "audit:prod": "npm audit --omit=dev --audit-level=high",
     "ci": "npm run validate && npm run audit:prod"
   },
   "dependencies": {
-    "@prisma/client": "^6.7.0",
+    "@prisma/composer": "0.38.0",
+    "@prisma/composer-prisma-cloud": "0.38.0",
+    "@prisma/orm-postgres": "8.0.0-rc.23",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
+    "effect": "4.0.5",
     "express": "^4.21.2",
-    "pg": "^8.13.1",
-    "prisma": "^6.7.0"
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "prisma": "8.0.0-rc.33"
+  },
+  "overrides": {
+    "effect": "4.0.5",
+    "@effect/vitest": "4.0.5",
+    "@effect/platform-bun": "4.0.5",
+    "@effect/platform-node": "4.0.5",
+    "@effect/platform-node-shared": "4.0.5"
   }
 }

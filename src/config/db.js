@@ -1,11 +1,14 @@
+// Raw pg pool for graceful shutdown. Its connection string comes from the
+// service's database dependency, never from environment variables.
+const service = require('../../service.mjs').default;
 const { Pool } = require('pg');
 
+const { db } = service.load();
+
 const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: Number(process.env.DB_PORT) || 5432,
-  database: process.env.DB_NAME || 'ogadmin',
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD,
+  connectionString: db.url,
+  max: 1,
+  idleTimeoutMillis: 10000,
 });
 
 module.exports = pool;
